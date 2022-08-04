@@ -2,7 +2,7 @@
 
 Filtering queries with multiple values e.g
 
-[link here] (https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_filter_operators.htm#:~:text=nath%40gmail.com-,AND,customers.id%20%3E%20%3F%20OR%20customers.name%20LIKE%20%3F,-The%20output%20for)
+[link here] (<https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_filter_operators.htm#:~:text=nath%40gmail.com-,AND,customers.id%20%3E%20%3F%20OR%20customers.name%20LIKE%20%3F,-The%20output%20for>)
 
     `...WHERE id=2 AND/OR name='Louis Marie Atoluko Ayariga'`
 
@@ -27,3 +27,7 @@ and
 `artistDetails = Artist.query.with_entities( Artist.name, Artist.image_link).filter(Artist.id == pastShow.artist_id).first()`
 
 to fetch some columns with a filter
+
+you populate a form by doing
+`artist = Artist.query.filter(Artist.id == artist_id).first()`
+`form = ArtistForm(obj=artist)`
