@@ -526,15 +526,39 @@ def show_artist(artist_id):
 def edit_artist(artist_id):
     form = ArtistForm()
     artist = Artist.query.filter(Artist.id == artist_id).first()
+    data = {
+        "id": artist_id,
+        "name": artist.name,
+        "genres": artist.genres,
+        "city": artist.city,
+        "state": artist.state,
+        "phone": artist.phone,
+        "seeking_venue": artist.seeking_venue,
+        "image_link": artist.image_link,
+        "website": "https://www.gunsnpetalsband.com",
+        "facebook_link": "https://www.facebook.com/GunsNPetals",
+        "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
+    }
     # TODO: populate form with fields from artist with ID <artist_id>
-    return render_template('forms/edit_artist.html', form=form, artist=artist)
+    return render_template('forms/edit_artist.html', form=form, artist=data)
 
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
     # TODO: take values from the form submitted, and update existing
     # artist record with ID <artist_id> using the new attributes
-
+    is_Successful = False
+    try:
+        Artist.query.filter(Artist.id == artist_id).update(request.form)
+        db.session.commit()
+        is_Successful = True
+    except:
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    flash('Artist details updated') if is_Successful else flash(
+        'Error: Artist details not updated')
     return redirect(url_for('show_artist', artist_id=artist_id))
 
 
@@ -578,8 +602,6 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
     # called upon submitting the new artist listing form
-    # TODO: insert form data as a new Venue record in the db, instead
-    # TODO: modify data to be the data object returned from db insertion
     is_Successful = False
     try:
         new_Artist = Artist(
@@ -609,8 +631,7 @@ def create_artist_submission():
         db.session.close()
 
     # on successful db insert, flash success
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
+    # flash('Artist ' + request.form['name'] + ' was successfully listed!')
     flash('Artist ' + request.form['name'] + ' was successfully listed!') if is_Successful else flash(
         'An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
     # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
@@ -699,7 +720,6 @@ def create_show_submission():
         flash('Show was successfully listed!')
     else:
         flash('An error occurred. Show could not be listed.')
-    # TODO: on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Show could not be listed.')
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     return render_template('pages/home.html')
