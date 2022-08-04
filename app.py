@@ -525,21 +525,7 @@ def show_artist(artist_id):
 def edit_artist(artist_id):
     artist = Artist.query.filter(Artist.id == artist_id).first()
     form = ArtistForm(obj=artist)
-    data = {
-        "id": artist_id,
-        "name": artist.name,
-        "genres": artist.genres,
-        "city": artist.city,
-        "state": artist.state,
-        "phone": artist.phone,
-        "seeking_venue": artist.seeking_venue,
-        "image_link": artist.image_link,
-        "website": "https://www.gunsnpetalsband.com",
-        "facebook_link": "https://www.facebook.com/GunsNPetals",
-        "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    }
-    # TODO: populate form with fields from artist with ID <artist_id>
-    return render_template('forms/edit_artist.html', form=form, artist=data)
+    return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
@@ -548,7 +534,26 @@ def edit_artist_submission(artist_id):
     # artist record with ID <artist_id> using the new attributes
     is_Successful = False
     try:
-        Artist.query.filter(Artist.id == artist_id).update(request.form)
+        updatedArtist = Artist(
+            name=request.form['name'],
+            city=request.form['city'],
+            state=request.form['state'],
+            phone=request.form['phone'],
+            genres=request.form['genres'],
+            facebook_link=request.form['facebook_link'],
+            image_link=request.form['image_link'],
+            website_link=request.form['website_link'],
+            seeking_description=request.form["seeking_description"]
+        )
+        try:
+            if (request.form['seeking_talent']):
+                updatedArtist.seeking_venue = True
+        except:
+            updatedArtist.seeking_venue = False
+            print("Artist seeking Venue  ", Artist.seeking_venue)
+        print("I was here")
+
+        Artist.query.filter(Artist.id == artist_id).update(updatedArtist)
         db.session.commit()
         is_Successful = True
     except:
@@ -563,22 +568,8 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    form = VenueForm()
-    venue = {
-        "id": 1,
-        "name": "The Musical Hop",
-        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-        "address": "1015 Folsom Street",
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "123-123-1234",
-        "website": "https://www.themusicalhop.com",
-        "facebook_link": "https://www.facebook.com/TheMusicalHop",
-        "seeking_talent": True,
-        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-    }
-    # TODO: populate form with values from venue with ID <venue_id>
+    venue = Venue.query.filter(Venue.id == venue_id).first()
+    form = VenueForm(obj=venue)
     print("Form: ", form)
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
@@ -587,6 +578,20 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
     # TODO: take values from the form submitted, and update existing
     # venue record with ID <venue_id> using the new attributes
+    is_Successful = False
+    try:
+
+        Venue.query.filter(Venue.id == venue_id).update(request.form)
+
+        db.session.commit()
+        is_Successful = True
+    except:
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    flash('Venue details updated') if is_Successful else flash(
+        'Error: Venue details not updated')
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
