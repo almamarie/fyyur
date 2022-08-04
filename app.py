@@ -191,8 +191,15 @@ def generatenumberUpcomingShowsList(queryList):
 
 # Helper function used to get number of upcoming shows.
 def getNumberOfupcomingShows(id):
-    Show.query.filter(
+    return Show.query.filter(
         Show.venue_id == id).filter(Show.start_time > datetime.now()).count()
+
+# Helper function used to get number of past shows.
+
+
+def getNumberOfPastShows(id):
+    return Show.query.filter(
+        Show.venue_id == id).filter(Show.start_time < datetime.now()).count()
 
 
 @app.route('/venues/search', methods=['POST'])
@@ -301,9 +308,88 @@ def show_venue(venue_id):
         "past_shows_count": 1,
         "upcoming_shows_count": 1,
     }
-    data = Venue.query.get(venue_id)
-    return render_template('pages/show_venue.html', venue=data)
 
+    template = {
+        "id": 2,
+        "name": "The Dueling Pianos Bar",
+        "genres": ["Classical", "R&B", "Hip-Hop"],
+        "address": "335 Delancey Street",
+        "city": "New York",
+        "state": "NY",
+        "phone": "914-003-1132",
+        "website": "https://www.theduelingpianos.com",
+        "facebook_link": "https://www.facebook.com/theduelingpianos",
+        "seeking_talent": False,
+        "image_link": "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
+        "past_shows": [],
+        "upcoming_shows": [],
+        "past_shows_count": 0,
+        "upcoming_shows_count": 0,
+    }
+
+    # fetch the details of the venue with the id specified
+    venue = Venue.query.filter(Venue.id == venue_id).first()
+    # if not venue:
+    #     flash(
+    #         'An error occurred. Venue ' + request.form['name'] + ' was not found.')
+    #     return
+
+    template = {
+        "id": venue_id,
+        "name": venue.name,
+        "genres": venue.genres,
+        "address": venue.address,
+        "city": venue.city,
+        "state": venue.state,
+        "phone": venue.phone,
+        "website": venue.website_link,
+        "facebook_link": venue.facebook_link,
+        "seeking_talent": venue.seeking_talent,
+        "image_link": venue.image_link,
+
+    }
+    print("venue: ", venue)
+
+    # fetch all the past shows of the venue from the shows table
+    listOfPastShows = getListOfPastShows(venue_id)
+
+    print("list of past shows", listOfPastShows)
+    # update number of past shows
+    template["past_shows"] = len(listOfPastShows)
+
+    # for each show fetch the id (already gotten), name, and image of the artist performing in the show
+    for pastShow in listOfPastShows:
+        print("I was here")
+        print("pastshow", pastShow.id)
+        artistDetails = Artist.query.with_entities(
+            Artist.name, Artist.image_link).filter(Artist.id == pastShow.artist_id).first()
+        print(artistDetails)
+        # tmp = {
+        #     "artist_id": pastShow.id,
+        #     "artist_name": artistDetails.name,
+        #     "artist_image_link": artistDetails.image_link,
+        #     "start_time": pastShow.start_time
+        # }
+
+        # print("tmp: ", tmp)
+
+    # fetch all the upcoming shows of the venue
+    numOfUpcomimgShows = getNumberOfupcomingShows(venue_id)
+    if numOfUpcomimgShows > 0:
+        template["upcoming_shows_count"] = 0
+    # for each show fetch the id (already gotten), name, and image of the artist performing in the show
+
+    return render_template('pages/show_venue.html', venue=data3)
+
+
+def getListOfPastShows(id):
+    return Show.query.filter(
+        Show.venue_id == id).filter(Show.start_time < datetime.now()).all()
+
+
+def getListOfUpcomingShows():
+    return Show.query.filter(
+        Show.venue_id == id).filter(Show.start_time > datetime.now()).all()
 #  Create Venue
 #  ----------------------------------------------------------------
 

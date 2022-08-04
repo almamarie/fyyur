@@ -17,3 +17,13 @@ like() method itself produces the LIKE criteria for WHERE clause in the SELECT e
 ```
 
 using `ilike` makes the comparation case insensitive.
+
+use
+`Artist.query.with_entities(Artist.id, Artist.name).all()`
+`
+to fetch some columns
+
+and
+`artistDetails = Artist.query.with_entities( Artist.name, Artist.image_link).filter(Artist.id == pastShow.artist_id).first()`
+
+to fetch some columns with a filter
