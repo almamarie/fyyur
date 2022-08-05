@@ -34,24 +34,24 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 # class enumGenres(enum.Enum):
-#     Alternative = enum.auto(),
-#     Blues = enum.auto(),
-#     Classical = enum.auto(),
-#     Country = enum.auto(),
-#     Electronic = enum.auto(),
-#     Folk = enum.auto(),
-#     Funk = enum.auto(),
-#     Hip-Hop = enum.auto(),
-#     Heavy Metal = enum.auto(),
-#     Instrumental = enum.auto(),
-#     Jazz = enum.auto(),
-#     Musical Theatre = enum.auto(),
-#     Pop = enum.auto(),
-#     Punk = enum.auto(),
-#     R & B = enum.auto(),
-#     Reggae = enum.auto(),
-#     Rock n Roll = enum.auto(),
-#     Soul = enum.auto(),
+#     Alternative = enum.auto()
+#     Blues = enum.auto()
+#     Classical = enum.auto()
+#     Country = enum.auto()
+#     Electronic = enum.auto()
+#     Folk = enum.auto()
+#     Funk = enum.auto()
+#     Hip-Hop = enum.auto()
+#     Heavy Metal = enum.auto()
+#     Instrumental = enum.auto()
+#     Jazz = enum.auto()
+#     'Musical Theatre' = enum.auto()
+#     Pop = enum.auto()
+#     Punk = enum.auto()
+#     R & B = enum.auto()
+#     Reggae = enum.auto()
+#     Rock n Roll = enum.auto()
+#     Soul = enum.auto()
 #     Other = enum.auto()
 
 
