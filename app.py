@@ -3,6 +3,7 @@
 #----------------------------------------------------------------------------#
 
 from collections import defaultdict
+import enum
 from hashlib import new
 import json
 import sys
@@ -32,6 +33,27 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+# class enumGenres(enum.Enum):
+#     Alternative = enum.auto(),
+#     Blues = enum.auto(),
+#     Classical = enum.auto(),
+#     Country = enum.auto(),
+#     Electronic = enum.auto(),
+#     Folk = enum.auto(),
+#     Funk = enum.auto(),
+#     Hip-Hop = enum.auto(),
+#     Heavy Metal = enum.auto(),
+#     Instrumental = enum.auto(),
+#     Jazz = enum.auto(),
+#     Musical Theatre = enum.auto(),
+#     Pop = enum.auto(),
+#     Punk = enum.auto(),
+#     R & B = enum.auto(),
+#     Reggae = enum.auto(),
+#     Rock n Roll = enum.auto(),
+#     Soul = enum.auto(),
+#     Other = enum.auto()
+
 
 class Show(db.Model):
     __tablename__ = 'show'
@@ -368,7 +390,7 @@ def create_venue_submission():
             city=request.form['city'],
             state=request.form['state'],
             phone=request.form['phone'],
-            genres=request.form['genres'],
+            genres=request.form.getlist('genres'),
             facebook_link=request.form['facebook_link'],
             image_link=request.form['image_link'],
             website_link=request.form['website_link'],
@@ -379,6 +401,8 @@ def create_venue_submission():
                 new_Venue.seeking_talent = True
         except:
             new_Venue.seeking_talent = False
+
+        print("G    enres: ", request.form.getlist('genres'))
         db.session.add(new_Venue)
         db.session.commit()
         is_Successful = True
@@ -537,7 +561,7 @@ def edit_artist_submission(artist_id):
         artist.city = request.form['city'],
         artist.state = request.form['state'],
         artist.phone = request.form['phone'],
-        artist.genres = request.form['genres'],
+        artist.genres = request.form.getlist('genres'),
         artist.facebook_link = request.form['facebook_link'],
         artist.image_link = request.form['image_link'],
         artist.website_link = request.form['website_link'],
@@ -583,13 +607,13 @@ def edit_venue_submission(venue_id):
         venue = Venue.query.filter(Venue.id == venue_id).one()
 
         # The genres only returns 1 value
-        print("Genre: ", request.form["genres"])
+        print("Genre: ", request.form.getlist("genres"))
         venue.name = request.form['name'],
         venue.city = request.form['city'],
         venue.state = request.form['state'],
         venue.address = request.form['address'],
         venue.phone = request.form['phone'],
-        venue.genres = str(request.form['genres']),
+        venue.genres = str(request.form.getlist('genres')),
         venue.facebook_link = request.form['facebook_link'],
         venue.image_link = request.form['image_link'],
         venue.website_link = request.form['website_link'],
@@ -632,7 +656,7 @@ def create_artist_submission():
             city=request.form['city'],
             state=request.form['state'],
             phone=request.form['phone'],
-            genres=request.form['genres'],
+            genres=request.form.getlist('genres'),
             facebook_link=request.form['facebook_link'],
             image_link=request.form['image_link'],
             website_link=request.form['website_link'],
