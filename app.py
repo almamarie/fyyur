@@ -360,7 +360,6 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-    # TODO: modify data to be the data object returned from db insertion
 
     is_Successful = False
     try:
@@ -398,13 +397,12 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
+
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
     is_Successful = False
     venue_name = ""
     try:
         venue = Venue.query.filter(Venue.id == venue_id).delete()
-        venue_name = venue.name
         db.session.commit()
         is_Successful = True
     except:
@@ -414,7 +412,7 @@ def delete_venue(venue_id):
         db.session.close()
 
     # Note: The bonus challenge has to wait, there is no time and my Django is bad
-    flash('Venue ' + venue_name + ' was successfully deleted!') if is_Successful else flash(
+    flash('Venue was successfully deleted!') if is_Successful else flash(
         'An error occurred. Venue could not be deleted.')
 
     # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
@@ -530,30 +528,32 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-    # TODO: take values from the form submitted, and update existing
     # artist record with ID <artist_id> using the new attributes
     is_Successful = False
     try:
-        updatedArtist = Artist(
-            name=request.form['name'],
-            city=request.form['city'],
-            state=request.form['state'],
-            phone=request.form['phone'],
-            genres=request.form['genres'],
-            facebook_link=request.form['facebook_link'],
-            image_link=request.form['image_link'],
-            website_link=request.form['website_link'],
-            seeking_description=request.form["seeking_description"]
-        )
-        try:
-            if (request.form['seeking_talent']):
-                updatedArtist.seeking_venue = True
-        except:
-            updatedArtist.seeking_venue = False
-            print("Artist seeking Venue  ", Artist.seeking_venue)
-        print("I was here")
+        artist = Artist.query.filter(Artist.id == artist_id).one()
 
-        Artist.query.filter(Artist.id == artist_id).update(updatedArtist)
+        artist.name = request.form['name'],
+        artist.city = request.form['city'],
+        artist.state = request.form['state'],
+        artist.phone = request.form['phone'],
+        artist.genres = request.form['genres'],
+        artist.facebook_link = request.form['facebook_link'],
+        artist.image_link = request.form['image_link'],
+        artist.website_link = request.form['website_link'],
+        artist.seeking_description = request.form["seeking_description"]
+
+        if request.form.get("seeking_venue") == None:
+            artist.seeking_venue = False
+        else:
+            artist.seeking_venue = True
+        # try:
+        #     artist.seeking_venue = True if request.form["seeking_venue"] else False
+        # except:
+        #     artist.seeking_venue = False
+
+        print("I was here")
+        db.session.add(artist)
         db.session.commit()
         is_Successful = True
     except:
@@ -576,13 +576,31 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
+
     # venue record with ID <venue_id> using the new attributes
     is_Successful = False
     try:
+        venue = Venue.query.filter(Venue.id == venue_id).one()
 
-        Venue.query.filter(Venue.id == venue_id).update(request.form)
+        # The genres only returns 1 value
+        print("Genre: ", request.form["genres"])
+        venue.name = request.form['name'],
+        venue.city = request.form['city'],
+        venue.state = request.form['state'],
+        venue.address = request.form['address'],
+        venue.phone = request.form['phone'],
+        venue.genres = str(request.form['genres']),
+        venue.facebook_link = request.form['facebook_link'],
+        venue.image_link = request.form['image_link'],
+        venue.website_link = request.form['website_link'],
+        venue.seeking_description = request.form["seeking_description"]
 
+        if request.form.get("seeking_talent") == None:
+            venue.seeking_talent = False
+        else:
+            venue.seeking_talent = True
+
+        db.session.add(venue)
         db.session.commit()
         is_Successful = True
     except:
@@ -621,7 +639,7 @@ def create_artist_submission():
             seeking_description=request.form["seeking_description"]
         )
         try:
-            if (request.form['seeking_talent']):
+            if (request.form['seeking_talent'] == 'y'):
                 new_Artist.seeking_venue = True
         except:
             new_Artist.seeking_venue = False
@@ -682,7 +700,6 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
     # called to create new shows in the db, upon submitting new show listing form
-    # TODO: insert form data as a new Show record in the db, instead
 
     is_successful = True
 
