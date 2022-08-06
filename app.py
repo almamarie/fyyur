@@ -19,9 +19,8 @@ from sqlalchemy import or_
 from forms import *
 from flask_migrate import Migrate
 from datetime import datetime
-from models import *
+from models import db, Artist, Show, Venue
 
-from database import db
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
