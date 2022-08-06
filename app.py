@@ -242,7 +242,9 @@ def show_venue(venue_id):
     print("venue: ", venue)
 
     # fetch all the past shows of the venue from the shows table
-    listOfPastShows = getListOfPastShows("venue", venue_id)
+    # listOfPastShows = getListOfPastShows("venue", venue_id)
+    listOfPastShows = db.session.query(Show).join(Venue).filter(
+        Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
 
     print("list of past shows", listOfPastShows)
     # update number of past shows
@@ -252,7 +254,8 @@ def show_venue(venue_id):
     template["past_shows"] = parseShows("venue", listOfPastShows)
 
     # fetch all the upcoming shows of the venue
-    listOfUpcomingShows = getListOfUpcomingShows("venue", venue_id)
+    listOfUpcomingShows = db.session.query(Show).join(Venue).filter(
+        Show.venue_id == venue_id).filter(Show.start_time > datetime.now()).all()
 
     # update number of upcoming shows
     template["upcoming_shows_count"] = len(listOfUpcomingShows)
@@ -467,6 +470,9 @@ def show_artist(artist_id):
 
     # fetch all the past shows of the artist from the shows table
     listOfPastShows = getListOfPastShows("artist", artist_id)
+
+    # db.session.query(Show).join(Venue).filter(
+    #     Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
 
     print("list of past shows", listOfPastShows)
     # update number of past shows
