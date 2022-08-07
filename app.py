@@ -64,7 +64,11 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 
 def format_datetime(value, format='medium'):
-    date = dateutil.parser.parse(value)
+    if not isinstance(value, datetime):
+        date = dateutil.parser.parse(value)
+    else:
+        date = value
+    # date = dateutil.parser.parse(value)
     if format == 'full':
         format = "EEEE MMMM, d, y 'at' h:mma"
     elif format == 'medium':
@@ -243,25 +247,33 @@ def show_venue(venue_id):
 
     # fetch all the past shows of the venue from the shows table
     # listOfPastShows = getListOfPastShows("venue", venue_id)
-    listOfPastShows = db.session.query(Show).join(Venue).filter(
-        Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
+    # listOfPastShows = db.session.query(Show).join(Venue).filter(
+    #     Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
 
-    print("list of past shows", listOfPastShows)
+    # print("list of past shows", listOfPastShows)
     # update number of past shows
-    template["past_shows_count"] = len(listOfPastShows)
+    # template["past_shows_count"] = len(listOfPastShows)
 
     # for each show fetch the id (already gotten), name, and image of the artist performing in the show
-    template["past_shows"] = parseShows("venue", listOfPastShows)
+    # template["past_shows"] = parseShows("venue", listOfPastShows)
 
     # fetch all the upcoming shows of the venue
-    listOfUpcomingShows = db.session.query(Show).join(Venue).filter(
-        Show.venue_id == venue_id).filter(Show.start_time > datetime.now()).all()
+    # listOfUpcomingShows = db.session.query(Show).join(Venue).filter(
+    #     Show.venue_id == venue_id).filter(Show.start_time > datetime.now()).all()
 
     # update number of upcoming shows
-    template["upcoming_shows_count"] = len(listOfUpcomingShows)
+    # template["upcoming_shows_count"] = len(listOfUpcomingShows)
 
     # for each show fetch the id (already gotten), name, and image of the artist performing in the show
-    template["upcoming_shows"] = parseShows("venue", listOfUpcomingShows)
+    # template["upcoming_shows"] = parseShows("venue", listOfUpcomingShows)
+
+    template["past_shows"] = db.session.query(Show).join(Venue).filter(
+        Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).with_entities(Venue.id, Venue.name, Venue.image_link, Show.start_time).all()
+    template["past_shows_count"] = len(template["past_shows"])
+
+    template["upcoming_shows"] = db.session.query(Show).join(Venue).filter(
+        Show.venue_id == venue_id).filter(Show.start_time > datetime.now()).with_entities(Venue.id, Venue.name, Venue.image_link, Show.start_time).all()
+    template["upcoming_shows_count"] = len(template["upcoming_shows"])
 
     print('pastShows done: ', template)
     return render_template('pages/show_venue.html', venue=template)
@@ -272,10 +284,10 @@ def parseShows(database, queryList):
     print("parsing a list of ", len(queryList), " shows")
     if database == "artist":
         for pastShow in queryList:
-            print("pastshow", pastShow.id)
+            # print("pastshow", pastShow.id)
             venueDetails = Artist.query.with_entities(
                 Artist.name, Artist.image_link).filter(Artist.id == pastShow.artist_id).first()
-            print(venueDetails)
+            # print(venueDetails)
             tmp = {
                 "venue_id": pastShow.id,
                 "venue_name": venueDetails.name,
@@ -284,14 +296,14 @@ def parseShows(database, queryList):
 
             }
 
-            print("tmp: ", tmp)
+            # print("tmp: ", tmp)
             parsed.append(tmp)
     elif database == "venue":
         for pastShow in queryList:
-            print("pastshow", pastShow.id)
+            # print("pastshow", pastShow.id)
             artistDetails = Artist.query.with_entities(
                 Artist.name, Artist.image_link).filter(Artist.id == pastShow.artist_id).first()
-            print(artistDetails)
+            # print(artistDetails)
             tmp = {
                 "artist_id": pastShow.id,
                 "artist_name": artistDetails.name,
@@ -300,27 +312,10 @@ def parseShows(database, queryList):
 
             }
 
-            print("tmp: ", tmp)
+            # print("tmp: ", tmp)
             parsed.append(tmp)
     return parsed
 
-
-def getListOfPastShows(database, id):
-    if database == "venue":
-        return Show.query.filter(
-            Show.venue_id == id).filter(Show.start_time < datetime.now()).all()
-    elif database == "artist":
-        return Show.query.filter(
-            Show.artist_id == id).filter(Show.start_time < datetime.now()).all()
-
-
-def getListOfUpcomingShows(database, id):
-    if database == "venue":
-        return Show.query.filter(
-            Show.venue_id == id).filter(Show.start_time > datetime.now()).all()
-    elif database == "artist":
-        return Show.query.filter(
-            Show.artist_id == id).filter(Show.start_time > datetime.now()).all()
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -469,28 +464,40 @@ def show_artist(artist_id):
     print("artist: ", artist)
 
     # fetch all the past shows of the artist from the shows table
-    listOfPastShows = getListOfPastShows("artist", artist_id)
+    # listOfPastShows = getListOfPastShows("artist", artist_id)
 
-    # db.session.query(Show).join(Venue).filter(
-    #     Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
+    # listOfPastShows = db.session.query(Show).join(Artist).filter(
+    #     Show.artist_id == artist_id).filter(Show.start_time < datetime.now()).all()
 
-    print("list of past shows", listOfPastShows)
-    # update number of past shows
-    template["past_shows_count"] = len(listOfPastShows)
+    # print("\nlist of past shows", listOfPastShows, "\n")
+    # # update number of past shows
 
     # for each show fetch the id (already gotten), name, and image of the artist performing in the show
-    template["past_shows"] = parseShows("artist", listOfPastShows)
+    template["past_shows"] = db.session.query(Show).join(Artist).filter(
+        Show.artist_id == artist_id).filter(Show.start_time < datetime.now()).with_entities(Artist.id, Artist.name, Artist.image_link, Show.start_time).all()
+    template["past_shows_count"] = len(template["past_shows"])
 
+    template["upcoming_shows"] = db.session.query(Show).join(Artist).filter(
+        Show.artist_id == artist_id).filter(Show.start_time > datetime.now()).with_entities(Artist.id, Artist.name, Artist.image_link, Show.start_time).all()
+    template["upcoming_shows_count"] = len(template["upcoming_shows"])
     # fetch all the upcoming shows of the artist
-    listOfUpcomingShows = getListOfUpcomingShows("artist", artist_id)
+    # listOfUpcomingShows = db.session.query(Show).join(Artist).filter(
+    #     Show.artist_id == artist_id).filter(Show.start_time > datetime.now()).all()
 
     # update number of upcoming shows
-    template["upcoming_shows_count"] = len(listOfUpcomingShows)
+
+    # print("\n Upcoming Shows : ", template["upcoming_shows"], "\n")
+
+    # print("\n\n\nTmp_Tmp: ", template["upcoming_shows"], "\n\n\n")
+    # tmpqw = {pastShow.id,
+    #     "venue_name": venueDetails.name,
+    #     "venue_image_link": venueDetails.image_link,
+    #     "start_time": str(pastShow.start_time)}
 
     # for each show fetch the id (already gotten), name, and image of the artist performing in the show
-    template["upcoming_shows"] = parseShows("artist", listOfUpcomingShows)
+    # template["upcoming_shows"] = parseShows("artist", listOfUpcomingShows)
 
-    print('pastShows done: ', template)
+    print('final data: ', template, "\n")
     return render_template('pages/show_artist.html', artist=template)
 
 
