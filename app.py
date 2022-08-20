@@ -97,10 +97,14 @@ def venues():
     #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
 
     allQueries = Venue.query.all()
-    # all = Venue.query.distinct(Venue.city, Venue.state).all()
 
-    response = createResponseObject(groupQuery(allQueries))
+    # all = Venue.query.distinct(Venue.city, Venue.state).all()
+    grouped = groupQuery(allQueries)
+    print("\nfinished grouping: ", grouped, "\n\n")
+
+    response = createResponseObject(grouped)
     # print('distinct   ', createResponseObject(all))
+    print("\n\nResponse response: ", response, "\n\n")
     return render_template('pages/venues.html', areas=response)
 
 
@@ -113,18 +117,47 @@ def groupQuery(venuesList):
     return groups.values()
 
 
+# response = [
+# {
+# "city": "san francisco",
+# "state": "AL",
+# "venues": [{
+#   id: 1,
+#   'name': :the musical grouop,
+#   num_upcoming_shows: 0
+# }]
+# },
+
+
+# {"city": "san francisco",
+# "state": "AL",
+# "venues": [{
+#   id: 1,
+#   'name': :the musical grouop,
+#   num_upcoming_shows: 0
+# }]
+# },
+# 
+# 
+#  data[0]['city]
+# 
+# data[[usa log angeles] [] []]
+# 
+# ]
+
 def createResponseObject(groupedQuery):
-    response = []
+    response = [ ]
+    
     for group in groupedQuery:
-        obj = {
+        state = {
             "city": "",
             "state": "",
             "venues": []
         }
-        obj['city'] = group[0].city
-        obj['state'] = group[0].state
+        state['city'] = group[0].city
+        state['state'] = group[0].state
 
-        # print(obj)
+        # print(state)
         for g in group:
             data = {
                 "id": 0,
@@ -136,10 +169,10 @@ def createResponseObject(groupedQuery):
             # current_time = datetime.datetime.utcnow()
             data["num_upcoming_shows"] = getNumberOfupcomingShows(g.id)
 
-            obj["venues"].append(data)
+            state["venues"].append(data)
 
-        response.append(obj)
-        # print(obj)
+        print(state)
+        response.append(state)
 
     return response
 
@@ -690,7 +723,6 @@ def create_show_submission():
     is_successful = True
 
     try:
-        # print('Date   ', format_datetime(request.form['start_time']))
         newShow = Show(
             venue_id=request.form['venue_id'],
             artist_id=request.form['artist_id'],
@@ -745,8 +777,3 @@ if __name__ == '__main__':
     app.run()
 
 # Or specify port manually:
-'''
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''
