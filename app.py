@@ -73,7 +73,7 @@ def venues():
 
     allQueries = Venue.query.all()
 
-    # all = Venue.query.distinct(Venue.city, Venue.state).all()
+    
     grouped = groupQuery(allQueries)
     print("\nfinished grouping: ", grouped, "\n\n")
 
