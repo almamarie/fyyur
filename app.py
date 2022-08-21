@@ -92,33 +92,6 @@ def groupQuery(venuesList):
     return groups.values()
 
 
-# response = [
-# {
-# "city": "san francisco",
-# "state": "AL",
-# "venues": [{
-#   id: 1,
-#   'name': :the musical grouop,
-#   num_upcoming_shows: 0
-# }]
-# },
-
-
-# {"city": "san francisco",
-# "state": "AL",
-# "venues": [{
-#   id: 1,
-#   'name': :the musical grouop,
-#   num_upcoming_shows: 0
-# }]
-# },
-# 
-# 
-#  data[0]['city]
-# 
-# data[[usa log angeles] [] []]
-# 
-# ]
 
 def createResponseObject(groupedQuery):
     response = [ ]
