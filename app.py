@@ -172,8 +172,6 @@ def search_venues():
     }
     search_term = request.form.get('search_term')
     print('search_term ', search_term)
-    # allMatchingShows = Venue.query.filter(
-    #     or_(Venue.name.like(search_term + "%"), Venue.name.like(search_term.lower() + "%"))).all()
     allMatchingShows = Venue.query.filter(
         Venue.name.ilike("%" + search_term + "%")).all()
     # print(allMatchingShows)
