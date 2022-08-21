@@ -32,10 +32,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
-
 
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
