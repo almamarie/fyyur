@@ -114,7 +114,7 @@ def createResponseObject(groupedQuery):
             }
             data['id'] = g.id
             data['name'] = g.name
-            # current_time = datetime.datetime.utcnow()
+           
             data["num_upcoming_shows"] = getNumberOfupcomingShows(g.id)
 
             state["venues"].append(data)
