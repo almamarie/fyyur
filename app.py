@@ -71,8 +71,6 @@ def index():
 @app.route('/venues')
 def venues():
 
-    #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-
     allQueries = Venue.query.all()
 
     # all = Venue.query.distinct(Venue.city, Venue.state).all()
