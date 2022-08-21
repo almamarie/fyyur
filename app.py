@@ -137,7 +137,7 @@ def generatenumberUpcomingShowsList(queryList):
         }
         data['id'] = g.id
         data['name'] = g.name
-        # current_time = datetime.datetime.utcnow()
+        
         data["num_upcoming_shows"] = getNumberOfupcomingShows(
             g.id) or data["num_upcoming_shows"]
 
